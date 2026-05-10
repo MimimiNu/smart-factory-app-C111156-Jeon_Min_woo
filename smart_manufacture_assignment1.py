@@ -288,7 +288,7 @@ if st.button("총괄생산계획 최적화 실행"):
 
   st.plotly_chart(fig5,use_container_width=True)
 
-st.subheader("비용 구성 대시보드")
+  st.subheader("비용 구성 대시보드")
 
   cost_columns = [
     "정규근무비용",
