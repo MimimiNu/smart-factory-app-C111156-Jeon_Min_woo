@@ -288,6 +288,64 @@ if st.button("총괄생산계획 최적화 실행"):
 
   st.plotly_chart(fig5,use_container_width=True)
 
+st.subheader("비용 구성 대시보드")
+
+  cost_columns = [
+    "정규근무비용",
+    "초과근무비용",
+    "고용비용",
+    "해고비용",
+    "재고유지비용",
+    "부족재고비용",
+    "재료비",
+    "하청비용"
+  ]
+
+  cost_summary = df[cost_columns].sum().reset_index()
+  cost_summary.columns = ["비용항목","비용"]
+
+  cost_summary["비용"] = cost_summary["비용"] *1000
+
+  fig_cost = px.bar(
+    cost_summary,
+    x = "비용항목",
+    y="비용",
+    text="비용",
+    title="총비용 구성"
+  )
+
+  fig_cost.update_traces(
+    texttemplate = "%{text:,.0f}원",
+    textposition="outside"
+  )
+
+  fig_cost.update_layout(
+    yaxis_title="비용(원)",
+    xaxis_title="비용 항목"
+  )
+
+  st.plotly_chart(fig_cost, use_container_width=True)
+
+
+
+  st.subheader("월별 비용 변화")
+
+  df_monthly_cost = df.copy()
+  df_monthly_cost["총월별비용"] = df_monthly_cost[cost_columns].sum(axis=1) * 1000
+
+  fig_monthly_cost = px.line(
+    df_monthly_cost,
+    x="월",
+    y="총월별비용",
+    markers=True,
+    title="월별 총비용 변화")
+  
+  fig_monthly_cost.update_layout(
+    yaxis_title="비용(원)",
+    xaxis_title="월")
+  
+  st.plotly_chart(fig_monthly_cost, use_container_width=True)
+
 else:
   st.info("왼쪽에서 파라미터를 입력한 뒤, 최적화 실행 버튼을 누르세요.")
 
