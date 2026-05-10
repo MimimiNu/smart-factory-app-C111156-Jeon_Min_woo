@@ -45,6 +45,7 @@ initial_workers = st.sidebar.number_input("초기 고용인원",value=80)
 initial_inventory = st.sidebar.number_input("초기 재고",value=1000)
 final_inventory_min = st.sidebar.number_input("6개월 말 최소 재고",value=500)
 
+subcontract_cost = st.sidebar.number_input("하청비용(천원/개)", value=30)
 # max_workers = st.sidebar.number_input("최대 고용 가능 인원", value=80)
 
 st.subheader("월별 예상 수요 입력")
@@ -160,6 +161,15 @@ def solve_aggregate_plan(demand,model_type):
   rows = []
 
   for t in model.T :
+    regular_cost = regular_wage * work_hours * work_days * value(model.W[t])
+    overtime_cost = overtime_wage * value(model.O[t])
+    hiring_cost_value = hiring_cost * value(model.H[t])
+    layoff_cost_value = layoff_cost * value(model.L[t])
+    inventory_cost_value = inventory_cost * value(model.I[t])
+    backlog_cost_value = backlog_cost * value(model.S[t])
+    material_cost_value = material_cost * value(model.P[t])
+    subcontract_cost_value = subcontract_cost * value(model.C[t])
+
     rows.append({
       "월" :t,
       "수요":demand_dict[t],
@@ -170,7 +180,15 @@ def solve_aggregate_plan(demand,model_type):
       "신규고용": round(value(model.H[t]), 2),
       "해고": round(value(model.L[t]), 2),
       "초과근무시간": round(value(model.O[t]), 2),
-      "하청량" : round(value(model.C[t]),2)
+      "하청량" : round(value(model.C[t]),2),
+      "정규근무비용": round(regular_cost, 2),
+      "초과근무비용": round(overtime_cost, 2),
+      "고용비용": round(hiring_cost_value, 2),
+      "해고비용": round(layoff_cost_value, 2),
+      "재고유지비용": round(inventory_cost_value, 2),
+      "부족재고비용": round(backlog_cost_value, 2),
+      "재료비": round(material_cost_value, 2),
+      "하청비용": round(subcontract_cost_value, 2),
     })
 
   df = pd.DataFrame(rows)
